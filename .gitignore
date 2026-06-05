@@ -1,0 +1,83 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+dist/
+build/
+
+# Runtime data
+uploads/
+data/
+logs/
+results/
+models/
+datasets/
+!uploads/.gitkeep
+!data/.gitkeep
+!logs/.gitkeep
+!models/.gitkeep
+!datasets/.gitkeep
+model_checkpoints/
+pretrained_models/
+*.log
+server.out.log
+server.err.log
+
+# Hugging Face / model caches
+.cache/
+hf_cache/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.parquet
+*.arrow
+*.wav
+*.mp3
+*.mp4
+*.webm
+*.flac
+
+# Local/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Old local artifacts that should not be pushed
+src/
+docs/
+files/
+BENCHMARK_TECHNICAL_SPEC.md
+REPORT_COMPLETE.md
+SETUP.md
+WEBSITE_GUIDE.tex
+test_auth.py
+*.zip
+*.exe
+*.docx

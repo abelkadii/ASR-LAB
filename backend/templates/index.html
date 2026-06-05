@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Darija ASR Lab</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --blue: #1d5fd1;
+      --green: #0f9f6e;
+      --red: #c2414b;
+      --amber: #b7791f;
+      --violet: #6d5bd0;
+      --cyan: #0e7490;
+      --soft-blue: #eaf2ff;
+      --soft-green: #e8f8f1;
+      --soft-red: #fff0f1;
+      --soft-amber: #fff7e6;
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    aside {
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 18px;
+      overflow: auto;
+    }
+    main {
+      padding: 20px;
+      overflow: auto;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 25px; margin-bottom: 4px; }
+    h2 { font-size: 18px; margin-bottom: 12px; }
+    h3 { font-size: 14px; margin-bottom: 8px; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .stack { display: grid; gap: 12px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #42526b;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    select, textarea, input[type="file"], input[type="number"], input[type="text"], button {
+      width: 100%;
+      min-height: 40px;
+      font: inherit;
+      border-radius: 6px;
+    }
+    select, textarea, input[type="file"], input[type="number"], input[type="text"] {
+      border: 1px solid #c8d1dd;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 10px;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+    button {
+      border: 0;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+    button.secondary { background: #526071; }
+    button.success { background: var(--green); }
+    button.warning { background: var(--amber); }
+    button.ghost {
+      background: #eef3fb;
+      color: #28466f;
+      border: 1px solid #cad6e7;
+    }
+    button.small {
+      width: auto;
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 12px;
+    }
+    button:disabled {
+      background: #cbd5e1;
+      color: #697586;
+      cursor: not-allowed;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .tab {
+      width: auto;
+      background: #e6ebf2;
+      color: #314056;
+    }
+    .tab.active { background: var(--blue); color: #fff; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .status {
+      display: none;
+      border: 1px solid #b9cef5;
+      background: var(--soft-blue);
+      color: #1f4f99;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .status.show { display: block; }
+    .status.error {
+      border-color: #f0b7bd;
+      background: var(--soft-red);
+      color: #9b1c2b;
+    }
+    .sample-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+    }
+    .sample {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .sample.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px #c7d9ff;
+    }
+    .sample-head {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: #e7edf5;
+      color: #40516a;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .sample.active .badge { background: var(--blue); color: #fff; }
+    .sample-text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 13px;
+      min-width: 0;
+    }
+    canvas.wave {
+      width: 100%;
+      height: 44px;
+      margin-top: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+    audio { width: 100%; min-height: 38px; }
+    .result {
+      min-height: 92px;
+      background: #f9fbfd;
+      border: 1px solid #e1e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border-radius: 8px;
+      padding: 12px;
+      background: #172033;
+      color: #fff;
+    }
+    .metric:nth-child(2) { background: #134e4a; }
+    .metric:nth-child(3) { background: #5b3d8f; }
+    .metric:nth-child(4) { background: #7a4b10; }
+    .metric span { display: block; font-size: 12px; opacity: 0.8; }
+    .metric strong { display: block; font-size: 26px; margin-top: 4px; }
+    .diff {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      line-height: 1.9;
+    }
+    .token {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      border: 1px solid #dde5ef;
+      border-radius: 6px;
+      padding: 2px 6px;
+      background: #fff;
+      font-size: 13px;
+    }
+    .token.equal { background: var(--soft-green); border-color: #bdebd4; color: #116447; }
+    .token.substitution { background: var(--soft-amber); border-color: #f5d999; color: #7c4b04; }
+    .token.deletion { background: var(--soft-red); border-color: #f5b8bf; color: #9b1c2b; text-decoration: line-through; }
+    .token.insertion { background: #eef7fa; border-color: #b9e4ee; color: #0b6377; }
+    .token.accepted { background: #edfdf6; border-color: #8bd9b6; color: #0f6b49; }
+    .token button {
+      width: auto;
+      min-height: 24px;
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: #0f9f6e;
+      font-size: 12px;
+    }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid #e6edf5; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; color: #40516a; font-size: 12px; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: #eef3fb;
+      color: #28466f;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .switchline {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      min-height: 40px;
+    }
+    .switchline input { width: 18px; height: 18px; }
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric-grid, .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      main, aside { padding: 14px; }
+      .grid2, .grid3, .metric-grid { grid-template-columns: 1fr; }
+      .tabs { overflow: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <h1>ASR Lab</h1>
+      <p class="muted">Browse datasets, recorded clips, and sample audio. Select a clip to evaluate or transcribe it directly.</p>
+      <div class="stack">
+        <div>
+          <label for="datasetSelect">Dataset</label>
+          <select id="datasetSelect"><option>Loading datasets...</option></select>
+        </div>
+        <div class="grid2">
+          <div>
+            <label for="sampleLimit">Samples</label>
+            <input id="sampleLimit" type="number" min="1" max="200" value="50">
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="loadSamplesBtn" type="button">Load</button>
+          </div>
+        </div>
+        <div id="datasetStatus" class="status"></div>
+        <div class="panel stack" id="selectedPanel">
+          <h2>Selected Sample</h2>
+          <div id="selectedSummary" class="muted">No sample selected.</div>
+          <audio id="selectedAudio" controls></audio>
+          <div class="toolbar">
+            <button id="useForEvalBtn" type="button" class="small ghost" disabled>Use for Evaluation</button>
+            <button id="transcribeSampleBtn" type="button" class="small success" disabled>Transcribe Sample</button>
+          </div>
+        </div>
+      </div>
+      <div id="sampleList" class="sample-list">
+        <div class="muted">No samples loaded.</div>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Darija Speech Recognition Workbench</h1>
+      <p class="muted">Transcribe audio, inspect exact word/character errors, and run batch analysis with controlled noise.</p>
+      <div id="globalStatus" class="status"></div>
+
+      <div class="tabs">
+        <button class="tab active" type="button" data-view="transcribeView">Transcribe</button>
+        <button class="tab" type="button" data-view="labelView">Label</button>
+        <button class="tab" type="button" data-view="evaluateView">Evaluate</button>
+        <button class="tab" type="button" data-view="analysisView">Batch Analysis</button>
+      </div>
+
+      <section id="transcribeView" class="view active">
+        <div class="panel stack">
+          <h2>Audio Transcription</h2>
+          <div class="grid2">
+            <div>
+              <label for="modelSelect">Model</label>
+              <select id="modelSelect"><option>Loading models...</option></select>
+            </div>
+            <div>
+              <label for="audioFile">Audio File</label>
+              <input id="audioFile" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm">
+            </div>
+          </div>
+          <div class="grid2">
+            <button id="transcribeBtn" type="button">Transcribe File</button>
+            <button id="transcribeSelectedBtn" type="button" class="ghost" disabled>Transcribe Selected Sample</button>
+          </div>
+          <div class="panel stack">
+            <h2>Recorded Audio</h2>
+            <div class="grid2">
+              <button id="recordBtn" type="button" class="secondary">Start Recording</button>
+              <button id="transcribeRecordingBtn" type="button" class="success" disabled>Transcribe Recording</button>
+            </div>
+            <audio id="recordedAudio" controls></audio>
+            <canvas id="recordingWave" class="wave" width="760" height="44"></canvas>
+          </div>
+          <div id="transcribeStatus" class="status"></div>
+          <div>
+            <label>Transcript</label>
+            <div id="transcriptionResult" class="result"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="labelView" class="view">
+        <div class="panel stack">
+          <h2>Audio Labeling</h2>
+          <div class="grid2">
+            <div>
+              <label for="labelAudioFile">Audio File</label>
+              <input id="labelAudioFile" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm">
+            </div>
+            <div>
+              <label for="labelNotes">Notes</label>
+              <input id="labelNotes" type="text" placeholder="speaker, source, quality, accent...">
+            </div>
+          </div>
+          <div>
+            <label for="labelText">Human Label / Transcript</label>
+            <textarea id="labelText" placeholder="Write the correct transcript for the uploaded audio or selected sample."></textarea>
+          </div>
+          <div class="grid2">
+            <button id="saveLabelFileBtn" type="button" class="success">Save Uploaded Audio Label</button>
+            <button id="saveLabelSampleBtn" type="button" class="ghost" disabled>Save Selected Sample Label</button>
+          </div>
+          <div id="labelStatus" class="status"></div>
+        </div>
+
+        <div class="panel stack">
+          <h2>Accepted Word Spellings</h2>
+          <p class="muted">When the model outputs a word spelled differently from the reference, mark it correct here or from the word diff. Future evaluations count that pair as accepted.</p>
+          <div class="grid2">
+            <div>
+              <label for="variantReference">Reference Word</label>
+              <input id="variantReference" type="text" placeholder="reference spelling">
+            </div>
+            <div>
+              <label for="variantHypothesis">Model Word</label>
+              <input id="variantHypothesis" type="text" placeholder="model spelling">
+            </div>
+          </div>
+          <button id="saveVariantBtn" type="button">Save Accepted Variant</button>
+          <div id="variantStatus" class="status"></div>
+          <div id="variantList" class="diff"></div>
+        </div>
+      </section>
+
+      <section id="evaluateView" class="view">
+        <div class="panel stack">
+          <h2>Detailed Evaluation</h2>
+          <div class="grid2">
+            <div>
+              <label for="compareModelSelect">Model</label>
+              <select id="compareModelSelect"><option>Loading models...</option></select>
+            </div>
+            <div>
+              <label for="compareAudioFile">Optional Audio File</label>
+              <input id="compareAudioFile" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm">
+            </div>
+          </div>
+          <div>
+            <label for="referenceText">Reference Text</label>
+            <textarea id="referenceText" placeholder="Select a dataset sample or type the expected text."></textarea>
+          </div>
+          <button id="compareBtn" type="button">Run Detailed Evaluation</button>
+          <div id="compareStatus" class="status"></div>
+          <div class="metric-grid">
+            <div class="metric"><span>WER</span><strong id="werValue">--</strong></div>
+            <div class="metric"><span>CER</span><strong id="cerValue">--</strong></div>
+            <div class="metric"><span>Word Errors</span><strong id="wordErrorValue">--</strong></div>
+            <div class="metric"><span>Character Errors</span><strong id="charErrorValue">--</strong></div>
+          </div>
+          <div class="grid2">
+            <div>
+              <label>Reference</label>
+              <div id="referenceDisplay" class="result"></div>
+            </div>
+            <div>
+              <label>Recognized</label>
+              <div id="hypothesisDisplay" class="result"></div>
+            </div>
+          </div>
+          <div>
+            <label>Word Diff</label>
+            <div id="wordDiff" class="result diff"></div>
+          </div>
+          <div>
+            <label>Character Diff</label>
+            <div id="charDiff" class="result diff"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="analysisView" class="view">
+        <div class="panel stack">
+          <h2>Batch Analysis</h2>
+          <div class="grid3">
+            <div>
+              <label for="analysisModelSelect">Model</label>
+              <select id="analysisModelSelect"><option>Loading models...</option></select>
+            </div>
+            <div>
+              <label for="analysisDatasetSelect">Dataset</label>
+              <select id="analysisDatasetSelect"><option>Loading datasets...</option></select>
+            </div>
+            <div>
+              <label for="analysisLimit">Run Samples</label>
+              <input id="analysisLimit" type="number" min="1" max="50" value="8">
+            </div>
+          </div>
+          <div class="grid3">
+            <div class="switchline">
+              <input id="noiseEnabled" type="checkbox">
+              <label for="noiseEnabled" style="margin:0;text-transform:none;font-size:13px">Add Gaussian noise</label>
+            </div>
+            <div>
+              <label for="snrDb">SNR dB</label>
+              <input id="snrDb" type="number" min="0" max="60" value="20">
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button id="runBatchBtn" type="button" class="warning">Run Batch Analysis</button>
+            </div>
+          </div>
+          <div id="analysisStatus" class="status"></div>
+          <div class="metric-grid">
+            <div class="metric"><span>Samples</span><strong id="batchCount">--</strong></div>
+            <div class="metric"><span>Average WER</span><strong id="batchWer">--</strong></div>
+            <div class="metric"><span>Average CER</span><strong id="batchCer">--</strong></div>
+            <div class="metric"><span>Avg Duration</span><strong id="batchDuration">--</strong></div>
+          </div>
+          <div class="grid2">
+            <div class="panel">
+              <h2>Words It Finds Easiest</h2>
+              <div id="easyWords" class="diff"></div>
+            </div>
+            <div class="panel">
+              <h2>Words It Struggles With</h2>
+              <div id="hardWords" class="diff"></div>
+            </div>
+          </div>
+          <div class="grid2">
+            <div>
+              <label>Common Word Substitutions</label>
+              <div id="wordSubstitutions" class="table-wrap"></div>
+            </div>
+            <div>
+              <label>Common Character Substitutions</label>
+              <div id="charSubstitutions" class="table-wrap"></div>
+            </div>
+          </div>
+          <div>
+            <label>Per-Sample Results</label>
+            <div id="batchResults" class="table-wrap"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      models: [],
+      datasets: [],
+      selectedSample: null,
+      recorder: null,
+      recordedChunks: [],
+      recordedBlob: null,
+      currentAudio: null,
+      lastMetrics: null,
+      waveformCache: new Map()
+    };
+
+    const els = {};
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      bindElements();
+      bindEvents();
+      await Promise.all([loadModels(), loadDatasets(), loadVariants()]);
+      drawEmptyWave(els.recordingWave, 'Recording waveform');
+      showStatus(els.globalStatus, 'Ready.');
+    }
+
+    function bindElements() {
+      [
+        'datasetSelect', 'analysisDatasetSelect', 'sampleLimit', 'loadSamplesBtn', 'datasetStatus',
+        'sampleList', 'selectedPanel', 'selectedSummary', 'selectedAudio', 'useForEvalBtn',
+        'transcribeSampleBtn', 'globalStatus', 'modelSelect', 'compareModelSelect',
+        'analysisModelSelect', 'audioFile', 'transcribeBtn', 'transcribeSelectedBtn',
+        'transcribeStatus', 'transcriptionResult', 'recordBtn', 'recordedAudio',
+        'transcribeRecordingBtn', 'recordingWave', 'compareAudioFile', 'referenceText',
+        'compareBtn', 'compareStatus', 'werValue', 'cerValue', 'wordErrorValue',
+        'charErrorValue', 'referenceDisplay', 'hypothesisDisplay', 'wordDiff', 'charDiff',
+        'labelAudioFile', 'labelNotes', 'labelText', 'saveLabelFileBtn', 'saveLabelSampleBtn',
+        'labelStatus', 'variantReference', 'variantHypothesis', 'saveVariantBtn',
+        'variantStatus', 'variantList',
+        'analysisLimit', 'noiseEnabled', 'snrDb', 'runBatchBtn', 'analysisStatus',
+        'batchCount', 'batchWer', 'batchCer', 'batchDuration', 'easyWords', 'hardWords',
+        'wordSubstitutions', 'charSubstitutions', 'batchResults'
+      ].forEach((id) => els[id] = document.getElementById(id));
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.tab').forEach((btn) => {
+        btn.addEventListener('click', () => switchView(btn.dataset.view));
+      });
+      els.loadSamplesBtn.addEventListener('click', loadSamples);
+      els.datasetSelect.addEventListener('change', () => {
+        els.analysisDatasetSelect.value = els.datasetSelect.value;
+      });
+      els.transcribeBtn.addEventListener('click', transcribeSelectedFile);
+      els.transcribeRecordingBtn.addEventListener('click', transcribeRecording);
+      els.recordBtn.addEventListener('click', toggleRecording);
+      els.compareBtn.addEventListener('click', runComparison);
+      els.saveLabelFileBtn.addEventListener('click', saveUploadedLabel);
+      els.saveLabelSampleBtn.addEventListener('click', saveSelectedSampleLabel);
+      els.saveVariantBtn.addEventListener('click', saveManualVariant);
+      els.runBatchBtn.addEventListener('click', runBatchAnalysis);
+      els.useForEvalBtn.addEventListener('click', useSelectedForEvaluation);
+      els.transcribeSampleBtn.addEventListener('click', transcribeSelectedSample);
+      els.transcribeSelectedBtn.addEventListener('click', transcribeSelectedSample);
+      els.compareAudioFile.addEventListener('change', () => {
+        if (els.compareAudioFile.files.length) state.selectedSample = null;
+      });
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.tab').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === viewId));
+      document.querySelectorAll('.view').forEach((view) => view.classList.toggle('active', view.id === viewId));
+    }
+
+    async function loadModels() {
+      try {
+        const data = await api('/models');
+        state.models = data.models || [];
+        fillSelect(els.modelSelect, state.models, data.default);
+        fillSelect(els.compareModelSelect, state.models, data.default);
+        fillSelect(els.analysisModelSelect, state.models, data.default);
+      } catch (error) {
+        showStatus(els.globalStatus, 'Could not load models: ' + error.message, true);
+      }
+    }
+
+    async function loadDatasets() {
+      try {
+        const data = await api('/datasets');
+        state.datasets = data.datasets || [];
+        fillSelect(els.datasetSelect, state.datasets, 'recorded-audio');
+        fillSelect(els.analysisDatasetSelect, state.datasets, 'recorded-audio');
+        showStatus(els.datasetStatus, `${state.datasets.length} datasets available.`);
+      } catch (error) {
+        showStatus(els.datasetStatus, 'Could not load datasets: ' + error.message, true);
+      }
+    }
+
+    async function loadVariants() {
+      try {
+        const data = await api('/word-variants');
+        renderVariantList(data.variants || []);
+      } catch (error) {
+        showStatus(els.variantStatus, 'Could not load accepted variants: ' + error.message, true);
+      }
+    }
+
+    function fillSelect(select, items, selected) {
+      select.innerHTML = '<option value="">Choose...</option>';
+      for (const item of items) {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = item.name;
+        select.append(option);
+      }
+      if (selected) select.value = selected;
+    }
+
+    async function loadSamples() {
+      const datasetId = els.datasetSelect.value;
+      const limit = Number(els.sampleLimit.value || 50);
+      if (!datasetId) {
+        showStatus(els.datasetStatus, 'Choose a dataset first.', true);
+        return;
+      }
+      showStatus(els.datasetStatus, 'Loading samples...');
+      els.sampleList.innerHTML = '';
+      try {
+        const data = await api(`/dataset-samples?dataset_id=${encodeURIComponent(datasetId)}&limit=${encodeURIComponent(limit)}`);
+        const samples = data.samples || [];
+        if (!samples.length) {
+          els.sampleList.innerHTML = '<div class="muted">This dataset returned no samples.</div>';
+          showStatus(els.datasetStatus, 'No samples found.');
+          return;
+        }
+        renderSamples(datasetId, samples, limit);
+        showStatus(els.datasetStatus, `Loaded ${samples.length} samples.`);
+      } catch (error) {
+        showStatus(els.datasetStatus, 'Sample load failed: ' + error.message, true);
+      }
+    }
+
+    function renderSamples(datasetId, samples, limit) {
+      els.sampleList.innerHTML = '';
+      samples.forEach((sample) => {
+        sample.dataset_id = datasetId;
+        sample.sample_limit = limit;
+        const row = document.createElement('div');
+        row.className = 'sample';
+        row.innerHTML = `
+          <div class="sample-head">
+            <div class="badge">${sample.index + 1}</div>
+            <div class="sample-text">${escapeHtml(sample.reference || '(no reference)')}</div>
+            <button class="small success play" type="button">Play</button>
+          </div>
+          <canvas class="wave" width="330" height="44"></canvas>
+        `;
+        row.addEventListener('click', (event) => {
+          if (event.target.closest('.play')) return;
+          selectSample(sample, row);
+        });
+        row.querySelector('.play').addEventListener('click', (event) => {
+          event.stopPropagation();
+          playAudio(sample.audio_url, row.querySelector('.play'));
+        });
+        els.sampleList.append(row);
+        drawWaveform(sample.audio_url, row.querySelector('canvas'));
+      });
+    }
+
+    function selectSample(sample, row) {
+      state.selectedSample = sample;
+      els.compareAudioFile.value = '';
+      els.referenceText.value = sample.reference || '';
+      els.selectedAudio.src = sample.audio_url;
+      els.selectedSummary.innerHTML = `
+        <strong>${escapeHtml(sample.dataset_id)}</strong>
+        <span class="pill">sample ${sample.index + 1}</span>
+        <div class="muted">${escapeHtml(sample.reference || 'No reference text')}</div>
+      `;
+      els.useForEvalBtn.disabled = false;
+      els.transcribeSampleBtn.disabled = false;
+      els.transcribeSelectedBtn.disabled = false;
+      els.saveLabelSampleBtn.disabled = false;
+      if (!els.labelText.value.trim()) els.labelText.value = sample.reference || '';
+      document.querySelectorAll('.sample').forEach((item) => item.classList.remove('active'));
+      row.classList.add('active');
+      showStatus(els.datasetStatus, `Selected sample ${sample.index + 1}.`);
+    }
+
+    function useSelectedForEvaluation() {
+      if (!state.selectedSample) return;
+      els.referenceText.value = state.selectedSample.reference || '';
+      switchView('evaluateView');
+      showStatus(els.compareStatus, `Using sample ${state.selectedSample.index + 1} from ${state.selectedSample.dataset_id}.`);
+    }
+
+    async function saveUploadedLabel() {
+      const file = els.labelAudioFile.files[0];
+      const label = els.labelText.value.trim();
+      if (!file) {
+        showStatus(els.labelStatus, 'Choose an audio file to label.', true);
+        return;
+      }
+      if (!label) {
+        showStatus(els.labelStatus, 'Write the label transcript first.', true);
+        return;
+      }
+      setBusy(els.saveLabelFileBtn, true, 'Saving...');
+      try {
+        const body = new FormData();
+        body.append('audio', file, file.name);
+        body.append('label', label);
+        body.append('notes', els.labelNotes.value.trim());
+        await api('/label-audio', { method: 'POST', body });
+        showStatus(els.labelStatus, 'Labeled audio saved to Recorded / Uploaded Audio.');
+        await loadDatasets();
+        els.datasetSelect.value = 'recorded-audio';
+        els.analysisDatasetSelect.value = 'recorded-audio';
+        await loadSamples();
+      } catch (error) {
+        showStatus(els.labelStatus, 'Label save failed: ' + error.message, true);
+      } finally {
+        setBusy(els.saveLabelFileBtn, false, 'Save Uploaded Audio Label');
+      }
+    }
+
+    async function saveSelectedSampleLabel() {
+      const label = els.labelText.value.trim();
+      if (!state.selectedSample) {
+        showStatus(els.labelStatus, 'Select a sample first.', true);
+        return;
+      }
+      if (!label) {
+        showStatus(els.labelStatus, 'Write the label transcript first.', true);
+        return;
+      }
+      setBusy(els.saveLabelSampleBtn, true, 'Saving...');
+      try {
+        await api('/label-sample', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dataset_id: state.selectedSample.dataset_id,
+            sample_index: state.selectedSample.index,
+            sample_limit: state.selectedSample.sample_limit || Number(els.sampleLimit.value || 50),
+            label,
+            notes: els.labelNotes.value.trim()
+          })
+        });
+        showStatus(els.labelStatus, 'Selected sample copied with your human label.');
+        await loadDatasets();
+        els.datasetSelect.value = 'recorded-audio';
+        els.analysisDatasetSelect.value = 'recorded-audio';
+        await loadSamples();
+      } catch (error) {
+        showStatus(els.labelStatus, 'Selected sample label failed: ' + error.message, true);
+      } finally {
+        setBusy(els.saveLabelSampleBtn, false, 'Save Selected Sample Label');
+      }
+    }
+
+    async function saveManualVariant() {
+      await saveVariant(els.variantReference.value, els.variantHypothesis.value, 'manual');
+    }
+
+    async function saveVariant(referenceWord, hypothesisWord, source) {
+      const reference = String(referenceWord || '').trim();
+      const hypothesis = String(hypothesisWord || '').trim();
+      if (!reference || !hypothesis) {
+        showStatus(els.variantStatus, 'Both words are required.', true);
+        return;
+      }
+      setBusy(els.saveVariantBtn, true, 'Saving...');
+      try {
+        await api('/word-variants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reference_word: reference,
+            hypothesis_word: hypothesis,
+            source
+          })
+        });
+        els.variantReference.value = '';
+        els.variantHypothesis.value = '';
+        showStatus(els.variantStatus, `Accepted variant saved: ${reference} = ${hypothesis}`);
+        await loadVariants();
+        if (state.lastMetrics) renderMetrics(state.lastMetrics);
+      } catch (error) {
+        showStatus(els.variantStatus, 'Variant save failed: ' + error.message, true);
+      } finally {
+        setBusy(els.saveVariantBtn, false, 'Save Accepted Variant');
+      }
+    }
+
+    async function transcribeSelectedFile() {
+      const file = els.audioFile.files[0];
+      if (!file) {
+        showStatus(els.transcribeStatus, 'Choose an audio file first.', true);
+        return;
+      }
+      await transcribeBlob(file, file.name);
+    }
+
+    async function transcribeRecording() {
+      if (!state.recordedBlob) {
+        showStatus(els.transcribeStatus, 'Record audio first.', true);
+        return;
+      }
+      await transcribeBlob(state.recordedBlob, 'recording.webm');
+    }
+
+    async function transcribeBlob(blob, filename) {
+      const modelId = els.modelSelect.value;
+      if (!modelId) {
+        showStatus(els.transcribeStatus, 'Choose a model first.', true);
+        return;
+      }
+      setBusy(els.transcribeBtn, true, 'Transcribing...');
+      showStatus(els.transcribeStatus, 'Transcribing audio and saving it to Recorded / Uploaded Audio...');
+      try {
+        const body = new FormData();
+        body.append('model_id', modelId);
+        body.append('audio', blob, filename);
+        const data = await api('/transcribe', { method: 'POST', body });
+        els.transcriptionResult.textContent = data.transcription || '';
+        showStatus(els.transcribeStatus, 'Transcription complete. Recorded dataset refreshed.');
+        await loadDatasets();
+        els.datasetSelect.value = 'recorded-audio';
+        els.analysisDatasetSelect.value = 'recorded-audio';
+        await loadSamples();
+      } catch (error) {
+        showStatus(els.transcribeStatus, 'Transcribe failed: ' + error.message, true);
+      } finally {
+        setBusy(els.transcribeBtn, false, 'Transcribe File');
+      }
+    }
+
+    async function transcribeSelectedSample() {
+      if (!state.selectedSample) {
+        showStatus(els.transcribeStatus, 'Select a sample first.', true);
+        return;
+      }
+      const modelId = els.modelSelect.value || els.compareModelSelect.value;
+      if (!modelId) {
+        showStatus(els.transcribeStatus, 'Choose a model first.', true);
+        return;
+      }
+      showStatus(els.transcribeStatus, 'Transcribing selected sample...');
+      setBusy(els.transcribeSampleBtn, true, 'Working...');
+      try {
+        const data = await api('/transcribe-sample', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model_id: modelId,
+            dataset_id: state.selectedSample.dataset_id,
+            sample_index: state.selectedSample.index,
+            sample_limit: state.selectedSample.sample_limit || Number(els.sampleLimit.value || 50)
+          })
+        });
+        els.transcriptionResult.textContent = data.transcription || '';
+        showStatus(els.transcribeStatus, 'Selected sample transcription complete.');
+        if (data.metrics) renderMetrics(data.metrics);
+      } catch (error) {
+        showStatus(els.transcribeStatus, 'Sample transcription failed: ' + error.message, true);
+      } finally {
+        setBusy(els.transcribeSampleBtn, false, 'Transcribe Sample');
+      }
+    }
+
+    async function toggleRecording() {
+      if (state.recorder && state.recorder.state === 'recording') {
+        state.recorder.stop();
+        return;
+      }
+      if (!navigator.mediaDevices || !window.MediaRecorder) {
+        showStatus(els.transcribeStatus, 'Recording is not supported in this browser.', true);
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        state.recordedChunks = [];
+        state.recorder = new MediaRecorder(stream);
+        state.recorder.ondataavailable = (event) => {
+          if (event.data.size) state.recordedChunks.push(event.data);
+        };
+        state.recorder.onstop = async () => {
+          stream.getTracks().forEach((track) => track.stop());
+          state.recordedBlob = new Blob(state.recordedChunks, { type: state.recorder.mimeType || 'audio/webm' });
+          const url = URL.createObjectURL(state.recordedBlob);
+          els.recordedAudio.src = url;
+          els.transcribeRecordingBtn.disabled = false;
+          els.recordBtn.textContent = 'Start Recording';
+          showStatus(els.transcribeStatus, 'Recording ready. You can transcribe it now.');
+          await drawWaveform(url, els.recordingWave);
+        };
+        state.recorder.start();
+        els.recordBtn.textContent = 'Stop Recording';
+        els.transcribeRecordingBtn.disabled = true;
+        showStatus(els.transcribeStatus, 'Recording...');
+      } catch (error) {
+        showStatus(els.transcribeStatus, 'Recording failed: ' + error.message, true);
+      }
+    }
+
+    async function runComparison() {
+      const modelId = els.compareModelSelect.value;
+      const reference = els.referenceText.value.trim();
+      if (!modelId) {
+        showStatus(els.compareStatus, 'Choose a model first.', true);
+        return;
+      }
+      if (!reference) {
+        showStatus(els.compareStatus, 'Reference text is required.', true);
+        return;
+      }
+      const body = new FormData();
+      body.append('model_id', modelId);
+      body.append('reference', reference);
+      if (els.compareAudioFile.files[0]) {
+        body.append('audio', els.compareAudioFile.files[0], els.compareAudioFile.files[0].name);
+      } else if (state.selectedSample) {
+        body.append('dataset_id', state.selectedSample.dataset_id);
+        body.append('sample_index', state.selectedSample.index);
+        body.append('sample_limit', state.selectedSample.sample_limit || Number(els.sampleLimit.value || 50));
+      } else {
+        showStatus(els.compareStatus, 'Upload audio or select a dataset sample.', true);
+        return;
+      }
+      showStatus(els.compareStatus, 'Running detailed evaluation...');
+      setBusy(els.compareBtn, true, 'Analyzing...');
+      try {
+        const data = await api('/compare', { method: 'POST', body });
+        renderMetrics(data.metrics);
+        showStatus(els.compareStatus, 'Evaluation complete.');
+      } catch (error) {
+        showStatus(els.compareStatus, 'Compare failed: ' + error.message, true);
+      } finally {
+        setBusy(els.compareBtn, false, 'Run Detailed Evaluation');
+      }
+    }
+
+    async function runBatchAnalysis() {
+      const modelId = els.analysisModelSelect.value;
+      const datasetId = els.analysisDatasetSelect.value;
+      if (!modelId || !datasetId) {
+        showStatus(els.analysisStatus, 'Choose a model and dataset first.', true);
+        return;
+      }
+      const payload = {
+        model_id: modelId,
+        dataset_id: datasetId,
+        limit: Number(els.analysisLimit.value || 8),
+        sample_pool: Math.max(Number(els.sampleLimit.value || 50), Number(els.analysisLimit.value || 8)),
+        add_noise: els.noiseEnabled.checked,
+        snr_db: Number(els.snrDb.value || 20)
+      };
+      showStatus(els.analysisStatus, 'Running batch analysis. This can take a while on large models...');
+      setBusy(els.runBatchBtn, true, 'Running...');
+      try {
+        const data = await api('/analyze-batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        renderBatch(data);
+        showStatus(els.analysisStatus, 'Batch analysis complete.');
+      } catch (error) {
+        showStatus(els.analysisStatus, 'Batch analysis failed: ' + error.message, true);
+      } finally {
+        setBusy(els.runBatchBtn, false, 'Run Batch Analysis');
+      }
+    }
+
+    function renderMetrics(metrics) {
+      state.lastMetrics = metrics;
+      els.werValue.textContent = formatPercent(metrics.wer);
+      els.cerValue.textContent = formatPercent(metrics.cer);
+      els.wordErrorValue.textContent = String((metrics.word_errors || []).length);
+      const charSummary = metrics.char_summary || {};
+      const charErrors = (charSummary.substitution || 0) + (charSummary.deletion || 0) + (charSummary.insertion || 0);
+      els.charErrorValue.textContent = String(charErrors);
+      els.referenceDisplay.textContent = metrics.reference || '';
+      els.hypothesisDisplay.textContent = metrics.hypothesis || '';
+      renderDiff(els.wordDiff, metrics.word_diff || []);
+      renderDiff(els.charDiff, metrics.char_diff || [], true);
+    }
+
+    function renderDiff(container, rows, compact = false) {
+      container.innerHTML = '';
+      if (!rows.length) {
+        container.textContent = 'No diff data.';
+        return;
+      }
+      for (const row of rows) {
+        const token = document.createElement('span');
+        token.className = `token ${row.type}`;
+        const ref = row.reference || '';
+        const hyp = row.hypothesis || '';
+        if (row.type === 'equal') {
+          token.textContent = compact ? visibleChar(ref) : ref;
+        } else if (row.type === 'insertion') {
+          token.textContent = `+${compact ? visibleChar(hyp) : hyp}`;
+        } else if (row.type === 'deletion') {
+          token.textContent = `-${compact ? visibleChar(ref) : ref}`;
+        } else if (row.type === 'accepted') {
+          token.textContent = `${compact ? visibleChar(ref) : ref} = ${compact ? visibleChar(hyp) : hyp}`;
+        } else {
+          token.textContent = `${compact ? visibleChar(ref) : ref} -> ${compact ? visibleChar(hyp) : hyp}`;
+          if (!compact && ref && hyp) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.title = 'Mark this spelling variant as correct';
+            button.textContent = 'Accept';
+            button.addEventListener('click', (event) => {
+              event.stopPropagation();
+              saveVariant(ref, hyp, 'word-diff');
+            });
+            token.append(button);
+          }
+        }
+        container.append(token);
+      }
+    }
+
+    function renderVariantList(rows) {
+      els.variantList.innerHTML = '';
+      if (!rows.length) {
+        els.variantList.innerHTML = '<span class="muted">No accepted spelling variants saved yet.</span>';
+        return;
+      }
+      rows.slice(0, 80).forEach((row) => {
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.textContent = `${row.reference_word} = ${row.hypothesis_word}`;
+        els.variantList.append(pill);
+      });
+    }
+
+    function renderBatch(data) {
+      const summary = data.summary || {};
+      els.batchCount.textContent = String(summary.count || 0);
+      els.batchWer.textContent = formatPercent(summary.avg_wer);
+      els.batchCer.textContent = formatPercent(summary.avg_cer);
+      els.batchDuration.textContent = `${Number(summary.avg_duration_seconds || 0).toFixed(1)}s`;
+      renderWordPills(els.easyWords, summary.easiest_words || [], true);
+      renderWordPills(els.hardWords, summary.hardest_words || [], false);
+      renderPairsTable(els.wordSubstitutions, summary.word_substitutions || [], ['Reference', 'Hypothesis', 'Count']);
+      renderPairsTable(els.charSubstitutions, summary.char_substitutions || [], ['Reference', 'Hypothesis', 'Count'], true);
+      renderResultsTable(data.results || []);
+    }
+
+    function renderWordPills(container, rows, easy) {
+      container.innerHTML = '';
+      if (!rows.length) {
+        container.innerHTML = '<span class="muted">No word pattern data yet.</span>';
+        return;
+      }
+      rows.slice(0, 18).forEach((row) => {
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.style.background = easy ? '#e8f8f1' : '#fff0f1';
+        pill.style.color = easy ? '#116447' : '#9b1c2b';
+        pill.textContent = `${row.word} ${Math.round(row.accuracy * 100)}% (${row.seen})`;
+        container.append(pill);
+      });
+    }
+
+    function renderPairsTable(container, rows, headers, compact = false) {
+      if (!rows.length) {
+        container.innerHTML = '<div class="result">No substitutions found.</div>';
+        return;
+      }
+      container.innerHTML = `
+        <table>
+          <thead><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${escapeHtml(compact ? visibleChar(row.reference) : row.reference)}</td>
+                <td>${escapeHtml(compact ? visibleChar(row.hypothesis) : row.hypothesis)}</td>
+                <td>${row.count}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderResultsTable(rows) {
+      if (!rows.length) {
+        els.batchResults.innerHTML = '<div class="result">No results.</div>';
+        return;
+      }
+      els.batchResults.innerHTML = `
+        <table>
+          <thead>
+            <tr><th>#</th><th>WER</th><th>CER</th><th>Reference</th><th>Hypothesis</th><th>Time</th></tr>
+          </thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${Number(row.index) + 1}</td>
+                <td>${formatPercent(row.wer)}</td>
+                <td>${formatPercent(row.cer)}</td>
+                <td>${escapeHtml(row.reference || '')}</td>
+                <td>${escapeHtml(row.hypothesis || '')}</td>
+                <td>${row.elapsed_seconds}s</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function playAudio(url, button) {
+      if (state.currentAudio) state.currentAudio.pause();
+      state.currentAudio = new Audio(url);
+      button.textContent = 'Stop';
+      state.currentAudio.addEventListener('ended', () => button.textContent = 'Play');
+      try {
+        await state.currentAudio.play();
+      } catch (error) {
+        button.textContent = 'Play';
+        showStatus(els.datasetStatus, 'Audio playback failed: ' + error.message, true);
+      }
+    }
+
+    async function drawWaveform(url, canvas) {
+      const ctx = canvas.getContext('2d');
+      drawEmptyWave(canvas, 'Loading waveform');
+      try {
+        let peaks = state.waveformCache.get(url);
+        if (!peaks) {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(response.statusText);
+          const bytes = await response.arrayBuffer();
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          const audioContext = new AudioContextClass();
+          const audio = await audioContext.decodeAudioData(bytes.slice(0));
+          peaks = buildPeaks(audio.getChannelData(0), canvas.width);
+          state.waveformCache.set(url, peaks);
+          await audioContext.close();
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#0e7490';
+        ctx.lineWidth = 1;
+        const mid = canvas.height / 2;
+        peaks.forEach((peak, x) => {
+          const h = Math.max(1, peak * (canvas.height - 8));
+          ctx.beginPath();
+          ctx.moveTo(x + 0.5, mid - h / 2);
+          ctx.lineTo(x + 0.5, mid + h / 2);
+          ctx.stroke();
+        });
+      } catch (error) {
+        drawEmptyWave(canvas, 'Waveform unavailable');
+      }
+    }
+
+    function drawEmptyWave(canvas, text) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px Segoe UI';
+      ctx.fillText(text, 10, 27);
+    }
+
+    function buildPeaks(channel, width) {
+      const block = Math.max(1, Math.floor(channel.length / width));
+      const peaks = [];
+      for (let x = 0; x < width; x += 1) {
+        let peak = 0;
+        const start = x * block;
+        const end = Math.min(channel.length, start + block);
+        for (let i = start; i < end; i += 1) peak = Math.max(peak, Math.abs(channel[i]));
+        peaks.push(peak);
+      }
+      return peaks;
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, options);
+      const type = response.headers.get('content-type') || '';
+      const data = type.includes('application/json') ? await response.json() : await response.text();
+      if (!response.ok || data.success === false) throw new Error(data.error || data || response.statusText);
+      return data;
+    }
+
+    function showStatus(el, message, isError = false) {
+      el.textContent = message;
+      el.classList.toggle('error', Boolean(isError));
+      el.classList.add('show');
+    }
+
+    function setBusy(button, busy, text) {
+      button.disabled = busy;
+      button.textContent = text;
+    }
+
+    function formatPercent(value) {
+      return `${(Number(value || 0) * 100).toFixed(1)}%`;
+    }
+
+    function visibleChar(value) {
+      if (value === ' ') return 'space';
+      if (value === '') return '';
+      return value;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
