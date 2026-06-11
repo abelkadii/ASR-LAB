@@ -1,0 +1,29 @@
+services:
+  darija-asr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: darija-asr-workbench:local
+    container_name: darija-asr-workbench
+    ports:
+      - "${SPEECHRECON_DOCKER_PORT:-5000}:5000"
+    environment:
+      FLASK_HOST: 0.0.0.0
+      FLASK_PORT: 5000
+      FLASK_DEBUG: 0
+      HF_TOKEN: "${SPEECHRECON_HF_TOKEN:-}"
+      SPEECHRECON_CACHE_ROOT: /cache
+      SPEECHRECON_MODEL_DIR: /cache/models
+      SPEECHRECON_DATASET_DIR: /cache/datasets
+      HF_HOME: /cache/huggingface
+      HF_HUB_CACHE: /cache/huggingface/hub
+      TRANSFORMERS_CACHE: /cache/huggingface/hub
+      HF_DATASETS_CACHE: /cache/huggingface/datasets
+    volumes:
+      - "${SPEECHRECON_HOST_DATA:-./data}:/app/data"
+      - "${SPEECHRECON_HOST_UPLOADS:-./uploads}:/app/uploads"
+      - "${SPEECHRECON_HOST_LOGS:-./logs}:/app/logs"
+      - "${SPEECHRECON_HOST_MODEL_CACHE:-./models}:/cache/models"
+      - "${SPEECHRECON_HOST_DATASET_CACHE:-./datasets}:/cache/datasets"
+      - "${SPEECHRECON_HOST_HF_CACHE:-./.docker-cache/huggingface}:/cache/huggingface"
+    restart: unless-stopped

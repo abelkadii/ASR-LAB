@@ -33,4 +33,21 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+  server: {
+    proxy: {
+      '/models': 'http://127.0.0.1:5000',
+      '/datasets': 'http://127.0.0.1:5000',
+      '/custom-datasets': 'http://127.0.0.1:5000',
+      '/dataset-samples': 'http://127.0.0.1:5000',
+      '/dataset-audio': 'http://127.0.0.1:5000',
+      '/progress': 'http://127.0.0.1:5000',
+      '/transcribe': 'http://127.0.0.1:5000',
+      '/transcribe-sample': 'http://127.0.0.1:5000',
+      '/label-audio': 'http://127.0.0.1:5000',
+      '/label-sample': 'http://127.0.0.1:5000',
+      '/word-variants': 'http://127.0.0.1:5000',
+      '/compare': 'http://127.0.0.1:5000',
+      '/analyze-batch': 'http://127.0.0.1:5000',
+    },
+  },
 })

@@ -11,6 +11,18 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 
 
+def load_env_file() -> None:
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
 def run(command: list[str], cwd: Path = ROOT) -> None:
     print(f"[setup] {' '.join(command)}")
     subprocess.run(command, cwd=cwd, check=True)
@@ -45,13 +57,18 @@ def build_frontend() -> None:
 
 
 def download_assets(selection: str, max_samples: int | None) -> None:
+    hf_home = os.getenv("HF_HOME") or str(ROOT / "models" / "hf-cache")
+    hf_hub_cache = os.getenv("HF_HUB_CACHE") or str(Path(hf_home) / "hub")
+    hf_datasets_cache = os.getenv("HF_DATASETS_CACHE") or str(ROOT / "datasets" / "hf-datasets")
     command = [
         PYTHON,
         str(ROOT / "scripts" / "download_hf_assets.py"),
         "--scope",
         selection,
         "--cache-dir",
-        str(ROOT / "models" / "hf-cache"),
+        hf_hub_cache,
+        "--dataset-cache-dir",
+        hf_datasets_cache,
     ]
     if max_samples is not None:
         command.extend(["--dataset-max-samples", str(max_samples)])
@@ -70,6 +87,7 @@ def main() -> None:
 
     ensure_dirs()
     write_env_if_missing()
+    load_env_file()
 
     if args.full or args.install_python:
         install_python_deps()

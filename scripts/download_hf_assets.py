@@ -35,6 +35,8 @@ class DatasetAsset:
     split: str
     source: str
     required_for: str
+    size_gb: float | None = None
+    notes: str = ""
 
 
 WEB_MODELS = [
@@ -248,6 +250,7 @@ WEB_DATASETS = [
         split="train",
         source="backend/app.py AVAILABLE_DATASETS / files/registry/datasets.py",
         required_for="web,benchmark",
+        size_gb=0.02,
     ),
     DatasetAsset(
         id="hafsata-darija-asr",
@@ -255,6 +258,7 @@ WEB_DATASETS = [
         split="train",
         source="backend/app.py AVAILABLE_DATASETS / files/registry/datasets.py",
         required_for="web,benchmark",
+        size_gb=0.98,
     ),
     DatasetAsset(
         id="mgb5-moroccan",
@@ -262,6 +266,7 @@ WEB_DATASETS = [
         split="train",
         source="backend/app.py AVAILABLE_DATASETS / files/registry/datasets.py",
         required_for="web,benchmark",
+        size_gb=6.20,
     ),
 ]
 
@@ -276,6 +281,7 @@ DISCOVERED_DATASETS = [
         split="train",
         source="files/registry/datasets.py inactive definition / Hugging Face search",
         required_for="optional-discovered",
+        size_gb=10.22,
     ),
     DatasetAsset(
         id="snousnou-darija-asr",
@@ -283,6 +289,7 @@ DISCOVERED_DATASETS = [
         split="train",
         source="files/registry/datasets.py inactive definition / Hugging Face search",
         required_for="optional-discovered",
+        size_gb=0.01,
     ),
     DatasetAsset(
         id="mohamedmou-dataset-darija",
@@ -290,6 +297,7 @@ DISCOVERED_DATASETS = [
         split="train",
         source="Hugging Face search: Darija ASR audio dataset",
         required_for="optional-discovered",
+        size_gb=0.37,
     ),
     DatasetAsset(
         id="mohamedmou-moroccan-darija-asr",
@@ -297,6 +305,8 @@ DISCOVERED_DATASETS = [
         split="train",
         source="Hugging Face search: Moroccan Darija ASR dataset",
         required_for="optional-discovered",
+        size_gb=None,
+        notes="Size not measured locally yet.",
     ),
     DatasetAsset(
         id="afyfbadreddine-darija-asr-clean",
@@ -304,6 +314,7 @@ DISCOVERED_DATASETS = [
         split="train",
         source="Hugging Face search: Darija ASR clean audio dataset",
         required_for="optional-discovered",
+        size_gb=5.09,
     ),
     DatasetAsset(
         id="atlasia-moulsot-preview",
@@ -311,6 +322,7 @@ DISCOVERED_DATASETS = [
         split="train",
         source="Hugging Face AtlasIA dataset listing",
         required_for="optional-discovered",
+        size_gb=0.79,
     ),
     DatasetAsset(
         id="atlasia-moulsot-full",
@@ -318,8 +330,44 @@ DISCOVERED_DATASETS = [
         split="test",
         source="Hugging Face search: MoulSot Moroccan Darija audio",
         required_for="optional-discovered-large",
+        size_gb=308.02,
+        notes="Very large full dataset. Download intentionally requires --include-discovered-datasets or --discovered-datasets-only.",
     ),
 ]
+
+
+def load_env_file() -> None:
+    env_path = ROOT_DIR / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+def format_size(size_gb: float | None) -> str:
+    return f"{size_gb:.2f} GB" if size_gb is not None else "unknown"
+
+
+def format_duration(hours: float | None) -> str:
+    if hours is None:
+        return "unknown"
+    minutes = hours * 60
+    if minutes < 1:
+        return "<1 min"
+    if minutes < 90:
+        return f"{minutes:.0f} min"
+    return f"{hours:.1f} hr"
+
+
+def estimate_download_hours(size_gb: float | None, mbps: float) -> float | None:
+    if size_gb is None or mbps <= 0:
+        return None
+    gib_to_gigabits = 1024 * 8 / 1000
+    return size_gb * gib_to_gigabits / mbps
 
 
 def parse_args() -> argparse.Namespace:
@@ -391,8 +439,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--cache-dir",
-        default=os.getenv("HF_HOME"),
-        help="Optional Hugging Face cache directory. Defaults to HF_HOME/default cache.",
+        default=os.getenv("HF_HUB_CACHE") or (str(Path(os.getenv("HF_HOME")) / "hub") if os.getenv("HF_HOME") else None),
+        help="Optional Hugging Face Hub model cache directory. Defaults to HF_HUB_CACHE or HF_HOME/hub.",
+    )
+    parser.add_argument(
+        "--dataset-cache-dir",
+        default=os.getenv("HF_DATASETS_CACHE"),
+        help="Optional Hugging Face datasets cache directory. Defaults to HF_DATASETS_CACHE.",
     )
     parser.add_argument(
         "--token",
@@ -409,6 +462,12 @@ def parse_args() -> argparse.Namespace:
         "--dry-run",
         action="store_true",
         help="List what would be downloaded without downloading anything.",
+    )
+    parser.add_argument(
+        "--download-mbps",
+        type=float,
+        default=100.0,
+        help="Connection speed used for rough time estimates. Default: 100 Mbps.",
     )
     return parser.parse_args()
 
@@ -449,12 +508,57 @@ def print_model_catalog() -> None:
     print(f"{'id':42} {'size':>8} {'cpu':18} {'framework':28} repo")
     print("-" * 120)
     for asset in assets:
-        size = f"{asset.size_gb:.2f} GB" if asset.size_gb is not None else "unknown"
+        size = format_size(asset.size_gb)
         print(f"{asset.id:42} {size:>8} {asset.cpu_fit:18} {asset.framework:28} {asset.hf_path}")
         if asset.notes:
             print(f"  notes: {asset.notes}")
     print("-" * 120)
     print("Tip: use --model-id <id> --models-only to download one model.")
+
+
+def log_download_plan(models: list[ModelAsset], datasets: list[DatasetAsset], download_mbps: float) -> None:
+    known_model_gb = sum(asset.size_gb or 0 for asset in models)
+    known_dataset_gb = sum(asset.size_gb or 0 for asset in datasets)
+    unknown_models = sum(1 for asset in models if asset.size_gb is None)
+    unknown_datasets = sum(1 for asset in datasets if asset.size_gb is None)
+    known_total_gb = known_model_gb + known_dataset_gb
+    logging.info(
+        "estimate known_total=%s models=%s datasets=%s unknown_models=%s unknown_datasets=%s at=%s Mbps rough_time=%s",
+        format_size(known_total_gb),
+        format_size(known_model_gb),
+        format_size(known_dataset_gb),
+        unknown_models,
+        unknown_datasets,
+        download_mbps,
+        format_duration(estimate_download_hours(known_total_gb, download_mbps)),
+    )
+
+    for asset in models:
+        logging.info(
+            "PLAN model id=%s repo=%s size=%s cpu_fit=%s time_at_%sMbps=%s required_for=%s",
+            asset.id,
+            asset.hf_path,
+            format_size(asset.size_gb),
+            asset.cpu_fit,
+            download_mbps,
+            format_duration(estimate_download_hours(asset.size_gb, download_mbps)),
+            asset.required_for,
+        )
+        if asset.notes:
+            logging.info("PLAN model notes id=%s %s", asset.id, asset.notes)
+    for asset in datasets:
+        logging.info(
+            "PLAN dataset id=%s repo=%s split=%s size=%s time_at_%sMbps=%s required_for=%s",
+            asset.id,
+            asset.hf_path,
+            asset.split,
+            format_size(asset.size_gb),
+            download_mbps,
+            format_duration(estimate_download_hours(asset.size_gb, download_mbps)),
+            asset.required_for,
+        )
+        if asset.notes:
+            logging.info("PLAN dataset notes id=%s %s", asset.id, asset.notes)
 
 
 def dedupe_models(assets: Iterable[ModelAsset]) -> list[ModelAsset]:
@@ -569,6 +673,7 @@ def download_dataset(
 
 
 def main() -> int:
+    load_env_file()
     args = parse_args()
     log_path = setup_logging()
 
@@ -613,24 +718,16 @@ def main() -> int:
         datasets = []
 
     logging.info("speechRecon Hugging Face asset download")
-    logging.info("scope=%s cache_dir=%s log=%s", args.scope, args.cache_dir or "<default>", log_path)
+    logging.info(
+        "scope=%s model_cache_dir=%s dataset_cache_dir=%s log=%s",
+        args.scope,
+        args.cache_dir or "<default>",
+        args.dataset_cache_dir or "<default>",
+        log_path,
+    )
     logging.info("models=%s datasets=%s", len(models), len(datasets))
 
-    for asset in models:
-        logging.info(
-            "PLAN model id=%s repo=%s required_for=%s",
-            asset.id,
-            asset.hf_path,
-            asset.required_for,
-        )
-    for asset in datasets:
-        logging.info(
-            "PLAN dataset id=%s repo=%s split=%s required_for=%s",
-            asset.id,
-            asset.hf_path,
-            asset.split,
-            asset.required_for,
-        )
+    log_download_plan(models, datasets, args.download_mbps)
 
     if args.dry_run:
         if args.discover_hf:
@@ -651,7 +748,7 @@ def main() -> int:
 
     for asset in datasets:
         try:
-            download_dataset(asset, args.cache_dir, args.token, args.dataset_max_samples)
+            download_dataset(asset, args.dataset_cache_dir, args.token, args.dataset_max_samples)
         except Exception:
             failures += 1
             logging.exception("DATASET failed id=%s repo=%s", asset.id, asset.hf_path)

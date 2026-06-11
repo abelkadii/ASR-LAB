@@ -1,0 +1,452 @@
+{
+  "generated_at": "2026-06-08T00:58:49.528846+00:00",
+  "dataset_count": 10,
+  "cache_root": "D:\\Code\\side-dev\\speechRecon\\datasets",
+  "datasets": {
+    "dvoice-v2-cleaned": {
+      "id": "dvoice-v2-cleaned",
+      "name": "DVoice v2 Cleaned",
+      "hf_path": "BounharAbdelaziz/Dvoice-v2-cleaned",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "transcription_darija_ar",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:13.738584+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 16,
+      "likes": 0,
+      "last_modified": "2025-01-19T01:09:09+00:00",
+      "repo_file_count": 3,
+      "repo_size_bytes": 15092309,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:n<1K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:pandas",
+        "library:mlcroissant",
+        "library:polars",
+        "region:us"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "audio",
+        "transcription_darija_ar",
+        "transcription_darija_ltn",
+        "intent",
+        "sentiment",
+        "gender_label",
+        "lead_time",
+        "sample_rate",
+        "split",
+        "duration"
+      ],
+      "split_rows": {
+        "train": 120
+      },
+      "sample_count": 120,
+      "available_splits": [
+        "train"
+      ],
+      "repo_size_gb": 0.0141
+    },
+    "hafsata-darija-asr": {
+      "id": "hafsata-darija-asr",
+      "name": "HAFSATA Darija ASR",
+      "hf_path": "HAFSATA/darija-asr-monolingual",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "sentence",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:23.625962+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 25,
+      "likes": 0,
+      "last_modified": "2026-03-24T23:31:36+00:00",
+      "repo_file_count": 6,
+      "repo_size_bytes": 1046616413,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:10K<n<100K",
+        "format:parquet",
+        "format:optimized-parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:polars",
+        "library:mlcroissant",
+        "region:us"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "audio",
+        "transcript",
+        "lang",
+        "duree"
+      ],
+      "split_rows": {
+        "train": 9494,
+        "validation": 1187,
+        "test": 1187
+      },
+      "sample_count": 11868,
+      "available_splits": [
+        "train",
+        "validation",
+        "test"
+      ],
+      "repo_size_gb": 0.9747
+    },
+    "mgb5-moroccan": {
+      "id": "mgb5-moroccan",
+      "name": "MGB-5 Moroccan Arabic",
+      "hf_path": "ArabicSpeech/MGB-5",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "sentence",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:34.536512+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 107,
+      "likes": 1,
+      "last_modified": "2025-08-11T02:35:25+00:00",
+      "repo_file_count": 5,
+      "repo_size_bytes": 6654203337,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:10K<n<100K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:pandas",
+        "library:mlcroissant",
+        "library:polars",
+        "region:us"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "id",
+        "audio",
+        "text"
+      ],
+      "split_rows": {
+        "train": 33338,
+        "validation": 6163,
+        "test": 5752
+      },
+      "sample_count": 45253,
+      "available_splits": [
+        "train",
+        "validation",
+        "test"
+      ],
+      "repo_size_gb": 6.1972
+    },
+    "darija-wiki-audio": {
+      "id": "darija-wiki-audio",
+      "name": "AtlasIA Darija Wiki Audio",
+      "hf_path": "atlasia/Moroccan-Darija-Wiki-Audio-Dataset",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "transcript",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:42.993978+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "datasets: Couldn't reach https://huggingface.co/datasets/atlasia/Moroccan-Darija-Wiki-Audio-Dataset/resolve/main/dataset_infos.json (error 403)",
+      "downloads": 75,
+      "likes": 14,
+      "last_modified": "2025-02-14T12:35:13+00:00",
+      "repo_file_count": 32,
+      "repo_size_bytes": 10968359416,
+      "license": "cc-by-4.0",
+      "pretty_name": null,
+      "tags": [
+        "license:cc-by-4.0",
+        "size_categories:n<1K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:mlcroissant",
+        "library:polars",
+        "library:webdataset",
+        "region:us",
+        "audio",
+        "webdataset"
+      ],
+      "repo_size_gb": 10.2151
+    },
+    "snousnou-darija-asr": {
+      "id": "snousnou-darija-asr",
+      "name": "Snousnou Moroccan Darija ASR",
+      "hf_path": "Snousnou/Moroccan-Darija-ASR",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "transcription",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:45.738956+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 8,
+      "likes": 0,
+      "last_modified": "2024-07-17T12:45:26+00:00",
+      "repo_file_count": 5,
+      "repo_size_bytes": 487319,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:n<1K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:pandas",
+        "library:mlcroissant",
+        "library:polars",
+        "region:us"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "file",
+        "text"
+      ],
+      "split_rows": {
+        "train": 6,
+        "validation": 1,
+        "test": 2
+      },
+      "sample_count": 9,
+      "available_splits": [
+        "train",
+        "validation",
+        "test"
+      ],
+      "repo_size_gb": 0.0005
+    },
+    "mohamedmou-dataset-darija": {
+      "id": "mohamedmou-dataset-darija",
+      "name": "Mohamedmou DATASET Darija",
+      "hf_path": "mohamedmou/DATASET-darija",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "sentence",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:57:56.936460+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 157,
+      "likes": 1,
+      "last_modified": "2026-05-08T13:48:27+00:00",
+      "repo_file_count": 18,
+      "repo_size_bytes": 390358847,
+      "license": "cc-by-4.0",
+      "pretty_name": "Darija ASR Dataset",
+      "tags": [
+        "task_categories:automatic-speech-recognition",
+        "language:ar",
+        "language:ary",
+        "license:cc-by-4.0",
+        "size_categories:n<1K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:polars",
+        "library:mlcroissant",
+        "region:us",
+        "darija",
+        "moroccan-arabic",
+        "asr",
+        "speech",
+        "audio"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "audio",
+        "sentence"
+      ],
+      "split_rows": {
+        "train": 634
+      },
+      "sample_count": 634,
+      "available_splits": [
+        "train"
+      ],
+      "repo_size_gb": 0.3636
+    },
+    "afyfbadreddine-darija-asr-clean": {
+      "id": "afyfbadreddine-darija-asr-clean",
+      "name": "Darija ASR Clean",
+      "hf_path": "afyfbadreddine77/darija-asr-clean",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "sentence",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:58:05.543916+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "",
+      "downloads": 20,
+      "likes": 0,
+      "last_modified": "2026-05-01T15:57:09+00:00",
+      "repo_file_count": 12,
+      "repo_size_bytes": 5456921914,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:10K<n<100K",
+        "format:parquet",
+        "format:optimized-parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:polars",
+        "library:mlcroissant",
+        "region:us"
+      ],
+      "configs": [
+        "default"
+      ],
+      "description": "",
+      "features": [
+        "audio",
+        "text",
+        "duration",
+        "snr_db",
+        "text_hash",
+        "audio_fp",
+        "source"
+      ],
+      "split_rows": {
+        "train": 14929,
+        "val": 829,
+        "test": 830
+      },
+      "sample_count": 16588,
+      "available_splits": [
+        "train",
+        "val",
+        "test"
+      ],
+      "repo_size_gb": 5.0822
+    },
+    "atlasia-moulsot-preview": {
+      "id": "atlasia-moulsot-preview",
+      "name": "AtlasIA MoulSot Preview",
+      "hf_path": "atlasia/moulsot-preview",
+      "split": "train",
+      "audio_column": "audio",
+      "transcript_column": "transcript",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:58:16.689955+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "datasets: Couldn't reach https://huggingface.co/datasets/atlasia/moulsot-preview/resolve/main/dataset_infos.json (error 403)",
+      "downloads": 8,
+      "likes": 0,
+      "last_modified": "2025-10-19T12:59:29+00:00",
+      "repo_file_count": 4,
+      "repo_size_bytes": 846891675,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:1K<n<10K",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:mlcroissant",
+        "library:polars",
+        "region:us"
+      ],
+      "repo_size_gb": 0.7887
+    },
+    "atlasia-moulsot-full": {
+      "id": "atlasia-moulsot-full",
+      "name": "AtlasIA MoulSot Full",
+      "hf_path": "atlasia/MoulSot-Full",
+      "split": "test",
+      "audio_column": "audio",
+      "transcript_column": "transcript",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:58:19.141045+00:00",
+      "metadata_source": "huggingface",
+      "hf_metadata_error": "datasets: 429 Client Error: Too Many Requests for url: https://huggingface.co/api/datasets/atlasia/MoulSot-Full/revision/b819a9340c44f51f97938ad47ee96c97d89289b5 (Request ID: Root=1-6a2613ca-3cdd64805f38f860122fb835;2fd724c7-792c-4700-bbf5-3abd4bb13020)\n\nWe had to rate limit you, you hit the quota of 1000 api requests per 5 minutes period. Upgrade to a PRO user or Team/Enterprise organization account (https://hf.co/pricing) to get higher limits. See https://huggingface.co/docs/hub/rate-limits",
+      "downloads": 1113,
+      "likes": 11,
+      "last_modified": "2026-05-05T12:42:46+00:00",
+      "repo_file_count": 522,
+      "repo_size_bytes": 330731799661,
+      "license": null,
+      "pretty_name": null,
+      "tags": [
+        "size_categories:1M<n<10M",
+        "format:parquet",
+        "modality:audio",
+        "modality:text",
+        "library:datasets",
+        "library:dask",
+        "library:mlcroissant",
+        "library:polars",
+        "region:us"
+      ],
+      "configs": [
+        "100-gt-2.5",
+        "default",
+        "extra-gt-2.5",
+        "extra-lt-2.5"
+      ],
+      "repo_size_gb": 308.018
+    },
+    "recorded-audio": {
+      "id": "recorded-audio",
+      "name": "Recorded / Uploaded Audio",
+      "hf_path": "",
+      "split": "",
+      "audio_column": "audio",
+      "transcript_column": "reference",
+      "local_size_bytes": 0,
+      "local_size_gb": 0.0,
+      "collected_at": "2026-06-08T00:58:49.528846+00:00",
+      "sample_count": 0,
+      "metadata_source": "local",
+      "repo_size_gb": null
+    }
+  }
+}

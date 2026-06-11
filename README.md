@@ -54,10 +54,40 @@ cd ..
 
 ## Download Models And Datasets
 
+By default this project keeps Hugging Face assets on `E:\speechRecon-cache` so large model and dataset downloads do not fill the system drive. To move an existing Windows Hugging Face cache from `C:\Users\<you>\.cache\huggingface` to E and update `.env`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/move_hf_cache_to_e.ps1
+```
+
+If an earlier download placed `models--...` folders directly under `E:\speechRecon-cache\huggingface`, normalize the cache layout:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/normalize_hf_cache_layout.ps1
+```
+
 List available downloadable models:
 
 ```powershell
 python scripts/download_hf_assets.py --list-model-catalog
+```
+
+Plan the full model download with estimated size and time:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/download_models_to_e.ps1 -DownloadMbps 100
+```
+
+Download all registered and experimental models to E:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/download_models_to_e.ps1 -DownloadMbps 100 -Run
+```
+
+Download and then warm-load supported models one at a time:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/download_models_to_e.ps1 -DownloadMbps 100 -Run -WarmLoad
 ```
 
 Download the models and datasets used by the web app:
@@ -89,6 +119,63 @@ Open:
 http://127.0.0.1:5000
 ```
 
+## Run With Docker
+
+The Docker setup builds the React frontend inside the image and runs the Flask
+app on port `5000`. Runtime state stays outside the image through mounted
+volumes, so labels, uploads, downloaded models, datasets, and Hugging Face cache
+survive rebuilds.
+
+Prerequisite on Windows: Docker Desktop must be running with a Linux container
+backend. The normal setup is Docker Desktop + WSL2. If Docker says the Desktop
+engine cannot start, install WSL first:
+
+```powershell
+wsl --install
+```
+
+Restart Windows if the installer asks for it, then open Docker Desktop again.
+
+Build and start with repo-local volumes:
+
+```powershell
+docker compose up --build
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+To keep Docker runtime data on `E:` instead of inside the repo, copy the Docker
+environment template and edit the paths if needed:
+
+```powershell
+Copy-Item .env.docker.example .env.docker
+docker compose --env-file .env.docker up --build
+```
+
+If you need gated Hugging Face assets in Docker, set
+`SPEECHRECON_HF_TOKEN` in `.env.docker`. The Docker variable is intentionally
+not named `HF_TOKEN` so Compose does not accidentally import the token from the
+normal local `.env` file.
+
+Stop the container:
+
+```powershell
+docker compose down
+```
+
+Notes:
+
+- The default image installs CPU PyTorch so it works without NVIDIA Docker
+  setup. It can still use 32 GB system RAM, but GPU acceleration would need a
+  separate CUDA image/runtime setup.
+- The frontend is served by Flask from `frontend/dist` inside the container.
+- Do not bake large models or datasets into the image; keep them in the mounted
+  cache volumes.
+
 For frontend-only development:
 
 ```powershell
@@ -96,6 +183,59 @@ npm --prefix frontend run dev
 ```
 
 The frontend expects the Flask backend API to be available on the same origin in production.
+
+## Run The Full Registry Benchmark
+
+Start the Flask backend first, then use the registry benchmark runner from a second terminal.
+The script runs each backend model against each backend dataset with `min(available samples, 100)`
+samples, uses the backend analysis cache, logs progress and ETA, and keeps going if a model or
+dataset pair fails.
+
+Preview the planned work without running inference:
+
+```powershell
+python scripts/run_registry_benchmark.py --dry-run
+```
+
+Run the fast UI-stat benchmark. This is the recommended mode for populating model and dataset
+cards/charts without waiting for a full research benchmark:
+
+```powershell
+python scripts/run_registry_benchmark.py
+```
+
+It uses the `ui` profile by default: 10 then 25 samples per model/dataset pair, with early stops
+for very inaccurate or slow pairs. The backend cache means any samples already computed by a
+previous run are reused.
+
+Resume after an interrupted run:
+
+```powershell
+python scripts/run_registry_benchmark.py --resume
+```
+
+Run a larger but still bounded profile:
+
+```powershell
+python scripts/run_registry_benchmark.py --profile balanced --resume
+```
+
+Only run the full 100-sample matrix when you explicitly want a long benchmark:
+
+```powershell
+python scripts/run_registry_benchmark.py --profile full --resume
+```
+
+Outputs:
+
+- `data/registry_benchmark_results.json`
+- `logs/registry_benchmark.log`
+
+You can narrow the run while testing:
+
+```powershell
+python scripts/run_registry_benchmark.py --only-models whisper-medium-darija --only-datasets hafsata-darija-asr
+```
 
 ## GitHub Notes
 

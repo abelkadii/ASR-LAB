@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Darija ASR Lab</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: rgb(15 159 110 / 0.65) rgb(217 224 234 / 0.85); }
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: rgb(217 224 234 / 0.85); border-radius: 999px; }
+    *::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgb(15 159 110 / 0.85), rgb(14 116 144 / 0.65)); border: 2px solid rgb(245 247 251); border-radius: 999px; }
+    *::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, rgb(16 185 129), rgb(14 116 144 / 0.85)); }
+    *::-webkit-scrollbar-corner { background: var(--bg); }
     :root {
       --bg: #f5f7fb;
       --panel: #ffffff;

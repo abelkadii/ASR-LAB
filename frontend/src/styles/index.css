@@ -1,0 +1,283 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+:root {
+  --chart-grid: #1f1f23;
+  --chart-axis: #374151;
+  --chart-tick: #9ca3af;
+  --chart-tooltip-bg: #1a1a1d;
+  --chart-tooltip-border: #374151;
+  --chart-tooltip-text: #e5e7eb;
+}
+
+.theme-light {
+  --chart-grid: #e2e8f0;
+  --chart-axis: #cbd5e1;
+  --chart-tick: #64748b;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #cbd5e1;
+  --chart-tooltip-text: #0f172a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(16 185 129 / 0.55) rgb(15 15 17 / 0.85);
+}
+
+*::-webkit-scrollbar {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(15 15 17 / 0.85);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgb(16 185 129 / 0.78), rgb(5 150 105 / 0.58));
+  border: 2px solid rgb(15 15 17 / 0.95);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgb(52 211 153 / 0.92), rgb(16 185 129 / 0.72));
+}
+
+*::-webkit-scrollbar-corner {
+  background: rgb(15 15 17);
+}
+
+.theme-light * {
+  scrollbar-color: rgb(5 150 105 / 0.55) rgb(226 232 240 / 0.9);
+}
+
+.theme-light *::-webkit-scrollbar-track {
+  background: rgb(226 232 240 / 0.9);
+}
+
+.theme-light *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgb(16 185 129 / 0.78), rgb(5 150 105 / 0.58));
+  border-color: rgb(241 245 249 / 0.95);
+}
+
+.theme-light *::-webkit-scrollbar-corner {
+  background: rgb(241 245 249);
+}
+
+.theme-light .app-shell,
+.theme-light .bg-\[\#0a0a0b\] {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.theme-light .bg-\[\#121214\],
+.theme-light .bg-\[\#0f0f11\],
+.theme-light .bg-\[\#0d0d0f\],
+.theme-light .bg-\[\#101014\],
+.theme-light .bg-\[\#101012\],
+.theme-light .bg-\[\#0f1113\],
+.theme-light .bg-\[\#08090a\] {
+  background: #ffffff !important;
+}
+
+.theme-light .bg-\[\#1a1a1d\],
+.theme-light .bg-gray-800,
+.theme-light .bg-gray-800\/40,
+.theme-light .bg-gray-800\/30,
+.theme-light .bg-gray-800\/50,
+.theme-light .bg-gray-800\/80,
+.theme-light .disabled\:bg-gray-800:disabled {
+  background: #eef2f7 !important;
+}
+
+.theme-light .bg-gray-700,
+.theme-light .hover\:bg-gray-700:hover {
+  background: #dbe4ee !important;
+}
+
+.theme-light .bg-gray-900,
+.theme-light .bg-gray-900\/40,
+.theme-light .bg-gray-900\/50 {
+  background: #f1f5f9 !important;
+}
+
+.theme-light .border-gray-800,
+.theme-light .border-gray-800\/60,
+.theme-light .border-gray-700,
+.theme-light .border-gray-600,
+.theme-light .divide-gray-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .text-gray-100,
+.theme-light .text-gray-200,
+.theme-light .text-gray-300,
+.theme-light .disabled\:text-gray-500:disabled {
+  color: #0f172a !important;
+}
+
+.theme-light .text-gray-400,
+.theme-light .text-gray-500 {
+  color: #64748b !important;
+}
+
+.theme-light .text-gray-600 {
+  color: #475569 !important;
+}
+
+.theme-light .hover\:text-gray-200:hover {
+  color: #0f172a !important;
+}
+
+.theme-light .hover\:bg-gray-800\/30:hover,
+.theme-light .hover\:bg-gray-800\/40:hover,
+.theme-light .hover\:bg-gray-800\/50:hover,
+.theme-light .hover\:bg-gray-800:hover {
+  background: #e2e8f0 !important;
+}
+
+.theme-light .hover\:border-gray-600:hover {
+  border-color: #94a3b8 !important;
+}
+
+.theme-light .placeholder\:text-gray-600::placeholder {
+  color: #94a3b8 !important;
+}
+
+.theme-light .shadow-\[0_0_0_1px_rgba\(16\,185\,129\,0\.04\)\,0_18px_48px_rgba\(0\,0\,0\,0\.24\)\] {
+  box-shadow: 0 0 0 1px rgb(5 150 105 / 0.08), 0 18px 42px rgb(15 23 42 / 0.10) !important;
+}
+
+.theme-light .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.05\)\] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.85) !important;
+}
+
+.theme-light .control,
+.theme-light .textarea,
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.theme-light .modern-audio-range::-webkit-slider-runnable-track {
+  background: #cbd5e1;
+}
+
+.theme-light .modern-audio-range::-webkit-slider-thumb {
+  border-color: #f8fafc;
+}
+
+.theme-light .modern-audio-range::-moz-range-track {
+  background: #cbd5e1;
+}
+
+.theme-light .modern-audio-range::-moz-range-thumb {
+  border-color: #f8fafc;
+}
+
+.modern-audio-range {
+  accent-color: rgb(16 185 129);
+}
+
+.modern-audio-range::-webkit-slider-runnable-track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: rgb(31 41 55);
+}
+
+.modern-audio-range::-webkit-slider-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: -0.25rem;
+  border-radius: 999px;
+  background: rgb(52 211 153);
+  border: 2px solid rgb(15 17 19);
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
+  appearance: none;
+}
+
+.modern-audio-range::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: rgb(31 41 55);
+}
+
+.modern-audio-range::-moz-range-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 999px;
+  background: rgb(52 211 153);
+  border: 2px solid rgb(15 17 19);
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
+}
+
+.control {
+  width: 100%;
+  height: 2.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(55 65 81);
+  background: #1a1a1d;
+  padding: 0 0.625rem;
+  color: rgb(229 231 235);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.control:focus,
+.textarea:focus {
+  box-shadow: 0 0 0 2px rgb(16 185 129 / 0.4);
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(55 65 81);
+  background: #0f0f11;
+  padding: 0.5rem 0.75rem;
+  color: rgb(229 231 235);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.primary-action,
+.secondary-action {
+  width: 100%;
+  min-height: 2.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.primary-action {
+  background: rgb(16 185 129);
+  color: white;
+}
+
+.primary-action:hover {
+  background: rgb(5 150 105);
+}
+
+.secondary-action {
+  background: rgb(31 41 55);
+  color: rgb(209 213 219);
+}
+
+.secondary-action:hover {
+  background: rgb(55 65 81);
+}
+
+.primary-action:disabled,
+.secondary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

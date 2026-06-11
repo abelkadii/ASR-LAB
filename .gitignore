@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.docker.example
 
 # Python
 __pycache__/
@@ -48,6 +49,7 @@ server.err.log
 
 # Hugging Face / model caches
 .cache/
+.docker-cache/
 hf_cache/
 *.safetensors
 *.bin
@@ -70,7 +72,7 @@ Thumbs.db
 .vscode/
 
 # Old local artifacts that should not be pushed
-src/
+/src/
 docs/
 files/
 BENCHMARK_TECHNICAL_SPEC.md
