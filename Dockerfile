@@ -7,6 +7,12 @@ COPY frontend/package*.json ./
 RUN npm ci
 
 COPY frontend/ ./
+# api.tsx imports ../../../backend/dataset_metadata.json at build time.
+# Inside this stage, /frontend/../../../backend resolves to /backend.
+COPY backend/dataset_metadata.json /backend/dataset_metadata.json
+# ModelsWorkspace imports ../../../../../data/registry_benchmark_results.json.
+# Inside this stage, /frontend/../../../../../data resolves to /data.
+COPY data/registry_benchmark_results.json /data/registry_benchmark_results.json
 RUN npm run build
 
 
