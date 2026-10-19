@@ -1854,14 +1854,16 @@ def calculate_metrics(reference: str, hypothesis: str):
             "error": str(e)
         }
 
-# Load the default model on startup
+# Keep the API responsive while the container starts. Models load on first use;
+# set SPEECHRECON_PRELOAD_DEFAULT_MODEL=1 to warm the default model at startup.
 print(f"Device: {device}")
-print("Loading default model...")
 default_model_id = list(AVAILABLE_MODELS.keys())[0]
-try:
-    load_model(default_model_id)
-except Exception as e:
-    print(f"Warning: Could not preload default model: {e}")
+if os.getenv("SPEECHRECON_PRELOAD_DEFAULT_MODEL", "0").lower() in {"1", "true", "yes", "on"}:
+    print("Loading default model...")
+    try:
+        load_model(default_model_id)
+    except Exception as e:
+        print(f"Warning: Could not preload default model: {e}")
 
 @app.route('/')
 def index():

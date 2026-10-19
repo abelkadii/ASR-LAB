@@ -126,6 +126,32 @@ app on port `5000`. Runtime state stays outside the image through mounted
 volumes, so labels, uploads, downloaded models, datasets, and Hugging Face cache
 survive rebuilds.
 
+From a fresh clone with Docker Desktop running, start the workbench with:
+
+```powershell
+docker compose up --build
+```
+
+Open `http://127.0.0.1:5000`. The API starts without downloading a model during
+container startup. The first transcription loads the selected model into the
+persistent Hugging Face cache; the first dataset sample request downloads that
+dataset into its persistent cache. These first requests can take several
+minutes depending on model size and connection speed.
+
+To download the web catalog before opening the workbench, run this once:
+
+```powershell
+docker compose run --build --rm darija-asr python scripts/setup_runtime.py --download web --dataset-max-samples 50
+docker compose up -d
+```
+
+This downloads the web models and the first 50 rows of each configured web
+dataset into the same volumes used by the app. Omit `--dataset-max-samples 50`
+to fetch the full configured dataset splits. The full web model catalog can
+take several gigabytes. For a gated Hugging Face repository, set
+`SPEECHRECON_HF_TOKEN` in the environment or in `.env.docker` before running
+the download command.
+
 Prerequisite on Windows: Docker Desktop must be running with a Linux container
 backend. The normal setup is Docker Desktop + WSL2. If Docker says the Desktop
 engine cannot start, install WSL first:
@@ -175,6 +201,9 @@ Notes:
 - The frontend is served by Flask from `frontend/dist` inside the container.
 - Do not bake large models or datasets into the image; keep them in the mounted
   cache volumes.
+- Model loading is lazy by default so the API becomes available before large
+  model downloads finish. Set `SPEECHRECON_PRELOAD_DEFAULT_MODEL=1` if you want
+  the default model loaded before the API starts serving requests.
 
 For frontend-only development:
 

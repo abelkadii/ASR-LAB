@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Database, FileAudio, Loader2, Mic, PencilLine, Play, Plus, StopCircle, ThumbsUp, Upload, XCircle } from 'lucide-react';
+import { CheckCircle2, FileAudio, Loader2, Mic, PencilLine, Play, Plus, StopCircle, ThumbsUp, Upload, XCircle } from 'lucide-react';
 import { Workspace, DiffRow, formatPercent, Metrics, requestJson, useApi } from '../../api';
 import { AudioPlayer } from '../AudioPlayer';
 import { DetailedWaveform } from '../DetailedWaveform';
@@ -14,7 +14,12 @@ export function TranscribeResearchWorkspace({ onWorkspaceChange }: { onWorkspace
     datasets,
     selectedModel,
     selectedDataset,
+    setSelectedDataset,
+    samples,
     selectedSample,
+    setSelectedSample,
+    sampleLimit,
+    setSampleLimit,
     setStatus,
     loadSamples,
     refreshRegistries,
@@ -229,10 +234,27 @@ export function TranscribeResearchWorkspace({ onWorkspaceChange }: { onWorkspace
               </label>
             )}
             {inputMode === 'sample' && (
-              <button onClick={() => onWorkspaceChange('dataset')} className="h-9 w-full rounded bg-gray-800 text-gray-300 hover:bg-gray-700 text-sm font-medium flex items-center justify-center gap-2">
-                <Database className="w-4 h-4" />
-                Change in Datasets
-              </button>
+              <div className="space-y-2 rounded border border-gray-800 bg-[#121214] p-2">
+                <label className="block text-[10px] uppercase tracking-wide text-gray-500">Dataset</label>
+                <select value={selectedDataset} onChange={(event) => setSelectedDataset(event.target.value)} className="w-full bg-[#1a1a1d] border border-gray-700 rounded px-2 h-8 text-xs text-gray-200">
+                  {datasets.map((dataset) => <option key={dataset.id} value={dataset.id}>{dataset.name}</option>)}
+                </select>
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <select value={selectedSample?.dataset_id === selectedDataset ? selectedSample.index : ''} onChange={(event) => {
+                    const sample = samples.find((item) => item.index === Number(event.target.value));
+                    if (sample) { setSelectedSample(sample); setReferenceText(sample.reference || ''); setTranscript(''); setMetrics(null); }
+                  }} className="min-w-0 bg-[#1a1a1d] border border-gray-700 rounded px-2 h-8 text-xs text-gray-200">
+                    <option value="">Choose a loaded sample</option>
+                    {samples.filter((sample) => sample.dataset_id === selectedDataset).map((sample) => <option key={`${sample.dataset_id}-${sample.index}`} value={sample.index}>#{sample.index + 1} · {(sample.reference || 'No reference').slice(0, 40)}</option>)}
+                  </select>
+                  <button onClick={() => void loadSamples(selectedDataset, sampleLimit)} className="h-8 rounded bg-gray-800 px-2 text-[11px] text-gray-300 hover:bg-gray-700">Load</button>
+                </div>
+                <div className="grid grid-cols-[auto_1fr] items-center gap-2">
+                  <label className="text-[10px] text-gray-500">Limit</label>
+                  <input type="number" min={1} max={500} value={sampleLimit} onChange={(event) => setSampleLimit(Math.max(1, Number(event.target.value) || 1))} className="w-full bg-[#1a1a1d] border border-gray-700 rounded px-2 h-7 text-xs text-gray-200" />
+                </div>
+                {!selectedSample || selectedSample.dataset_id !== selectedDataset ? <button onClick={() => onWorkspaceChange('dataset')} className="w-full text-left text-[10px] text-emerald-400 hover:text-emerald-300">Browse dataset details</button> : null}
+              </div>
             )}
 
             <PanelTitle title="Save Result To" />

@@ -35,7 +35,6 @@ function architectureFor(model: ModelInfo) {
 
 function modelStatus(model: ModelInfo) {
   if (model.framework === 'peft+transformers') return 'adapter';
-  if ((model.min_vram_gb || 0) >= 3) return 'heavy';
   return 'available';
 }
 
@@ -48,14 +47,13 @@ function shortName(name: string) {
 }
 
 function benchmarkFor(model: ModelInfo): BenchmarkSnapshot {
-  const memory = `${model.min_vram_gb || 0} GB`;
   const stats = model.benchmark;
   if (stats && stats.samples > 0) {
     return {
       wer: formatPercent(stats.avg_wer),
       cer: formatPercent(stats.avg_cer),
       speed: formatSpeed(stats.avg_elapsed_seconds),
-      memory,
+      memory: '—',
       datasets: String(stats.runs || '-'),
       samples: stats.samples.toLocaleString(),
     };
@@ -64,7 +62,7 @@ function benchmarkFor(model: ModelInfo): BenchmarkSnapshot {
     wer: 'Not run',
     cer: 'Not run',
     speed: 'Pending',
-    memory,
+    memory: '—',
     datasets: '-',
     samples: '-',
   };
@@ -136,7 +134,6 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
   const { models, selectedModel, setSelectedModel, setStatus } = useApi();
   const [query, setQuery] = useState('');
   const [frameworkFilter, setFrameworkFilter] = useState('all');
-  const [vramFilter, setVramFilter] = useState('all');
   const [benchmarkFilter, setBenchmarkFilter] = useState('all');
 
   const frameworks = useMemo(
@@ -150,20 +147,14 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
       const text = `${model.name} ${model.id} ${model.framework}`.toLowerCase();
       const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
       const matchesFramework = frameworkFilter === 'all' || model.framework === frameworkFilter;
-      const vram = model.min_vram_gb || 0;
       const hasBenchmark = Boolean(model.benchmark && model.benchmark.samples > 0);
-      const matchesVram =
-        vramFilter === 'all' ||
-        (vramFilter === 'low' && vram <= 1) ||
-        (vramFilter === 'mid' && vram > 1 && vram <= 3) ||
-        (vramFilter === 'high' && vram > 3);
       const matchesBenchmark =
         benchmarkFilter === 'all' ||
         (benchmarkFilter === 'available' && hasBenchmark) ||
         (benchmarkFilter === 'missing' && !hasBenchmark);
-      return matchesQuery && matchesFramework && matchesVram && matchesBenchmark;
+      return matchesQuery && matchesFramework && matchesBenchmark;
     });
-  }, [benchmarkFilter, frameworkFilter, models, query, vramFilter]);
+  }, [benchmarkFilter, frameworkFilter, models, query]);
 
   const selected = models.find((model) => model.id === selectedModel) || filteredModels[0] || models[0];
   const selectedDetails = selected ? benchmarkDetailsFor(selected) : null;
@@ -221,17 +212,7 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
                 <option key={framework} value={framework}>{framework}</option>
               ))}
             </select>
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={vramFilter}
-                onChange={(event) => setVramFilter(event.target.value)}
-                className="h-8 rounded border border-gray-800 bg-[#0a0a0b] px-2 text-xs text-gray-300 outline-none focus:border-emerald-500"
-              >
-                <option value="all">All VRAM</option>
-                <option value="low">1 GB or less</option>
-                <option value="mid">1-3 GB</option>
-                <option value="high">Over 3 GB</option>
-              </select>
+            <div className="grid grid-cols-1 gap-2">
               <select
                 value={benchmarkFilter}
                 onChange={(event) => setBenchmarkFilter(event.target.value)}
@@ -263,8 +244,6 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
                   <div className="min-w-0">
                     <div className="truncate text-[15px] font-semibold text-gray-100">{shortName(model.name)}</div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                      <span>{model.min_vram_gb || 0} GB</span>
-                      <span className="h-1 w-1 rounded-full bg-gray-700" />
                       <span>{architectureFor(model)}</span>
                     </div>
                   </div>
@@ -298,8 +277,6 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
                     <span>{architectureFor(selected)}</span>
                     <span className="h-1 w-1 rounded-full bg-gray-700" />
-                    <span>{selected.min_vram_gb || 0} GB VRAM</span>
-                    <span className="h-1 w-1 rounded-full bg-gray-700" />
                     <span>{selected.benchmark?.samples ? `${selected.benchmark.samples.toLocaleString()} benchmark samples` : 'Awaiting benchmark'}</span>
                   </div>
                   <p className="mt-1 break-all font-mono text-xs text-gray-600">{selected.id}</p>
@@ -317,11 +294,10 @@ export function ModelsWorkspace({ onWorkspaceChange }: { onWorkspaceChange: (wor
                 </button>
               </div>
 
-              <div className="mt-5 grid grid-cols-4 gap-3">
+              <div className="mt-5 grid grid-cols-3 gap-3">
                 <HeroMetric label="WER" value={selectedBenchmark.wer} tone="emerald" />
                 <HeroMetric label="CER" value={selectedBenchmark.cer} tone="blue" />
                 <HeroMetric label="Speed" value={selectedBenchmark.speed} tone="amber" />
-                <HeroMetric label="Memory" value={selectedBenchmark.memory} tone="gray" />
               </div>
               <div className="mt-3 grid grid-cols-2 gap-3 text-xs md:grid-cols-4">
                 <Info label="Runs" value={selectedBenchmark.datasets} />

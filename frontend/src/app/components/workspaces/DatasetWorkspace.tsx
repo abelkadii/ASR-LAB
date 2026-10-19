@@ -89,7 +89,8 @@ export function DatasetWorkspace({ onWorkspaceChange }: DatasetWorkspaceProps) {
 
   function setActiveSample(sample: SampleInfo) {
     setSelectedSample(sample);
-    setStatus(`Active sample #${sample.index + 1} from ${sample.dataset_id}. Open Workbench to transcribe.`);
+    setStatus(`Opening sample #${sample.index + 1} from ${sample.dataset_id} in Workbench.`);
+    onWorkspaceChange('workbench');
   }
 
   async function createCustomDataset() {
@@ -302,7 +303,7 @@ export function DatasetWorkspace({ onWorkspaceChange }: DatasetWorkspaceProps) {
                   className="h-7 px-2 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded transition-colors flex items-center gap-1"
                 >
                   <CheckCircle2 className="w-3 h-3" />
-                  Use In Session
+                  Transcribe Sample
                 </button>
                 <button
                   onClick={() => openCopy(selectedSample)}
