@@ -34,25 +34,24 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        build-essential \
         curl \
         ffmpeg \
-        git \
         libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY requirements.txt docker-requirements.txt ./
 
 # The local Windows setup uses the CUDA PyTorch index. The default container is
 # CPU-first so it can run on any Docker Desktop installation without requiring
 # NVIDIA container runtime support.
-RUN pip install --index-url https://download.pytorch.org/whl/cpu \
-        "torch>=2.1,<2.4" \
-        "torchaudio>=2.1,<2.4" \
+RUN pip install --index-url https://pypi.org/simple \
+        --extra-index-url https://download.pytorch.org/whl/cpu \
+        "torch==2.3.1+cpu" \
+        "torchaudio==2.3.1+cpu" \
     && grep -vE '^(--extra-index-url|torch|torchaudio)' requirements.txt > /tmp/requirements-app.txt \
-    && pip install -r /tmp/requirements-app.txt
+    && pip install --constraint docker-requirements.txt -r /tmp/requirements-app.txt
 
 COPY backend/ ./backend/
 COPY scripts/ ./scripts/

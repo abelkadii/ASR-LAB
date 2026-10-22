@@ -2,7 +2,9 @@
 .agents
 .codex
 .venv
+**/.venv
 __pycache__
+**/__pycache__
 *.py[cod]
 *.pyo
 .pytest_cache
@@ -20,12 +22,21 @@ frontend/dist
 
 data/*
 !data/registry_benchmark_results.json
+files
+src
+docs
+reports
+screenshots
 datasets
 logs
 models
 model_checkpoints
 pretrained_models
+backend/model_checkpoints
+backend/pretrained_models
 uploads
+*.exe
+*.docx
 
 reports/*.pdf
 reports/*.aux

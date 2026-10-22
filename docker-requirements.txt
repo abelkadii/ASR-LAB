@@ -1,0 +1,8 @@
+# Keep Docker's CPU-only runtime aligned with the versions used by the app.
+# Without these constraints, newer SpeechBrain releases can upgrade Torch to a
+# version that no longer matches the Docker CPU wheels installed in Dockerfile.
+torch==2.3.1+cpu
+torchaudio==2.3.1+cpu
+transformers==4.46.3
+peft==0.19.1
+speechbrain==1.1.0
